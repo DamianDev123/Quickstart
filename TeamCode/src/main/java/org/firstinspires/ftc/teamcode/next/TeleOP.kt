@@ -39,14 +39,13 @@ class TeleOP: NextFTCOpMode() {
     }
 
     override fun onInit() {
-        InitActuators.init()// Or a LambdaCommand
+        InitActuators.init.schedule() // Or a LambdaCommand
         Gamepads.gamepad1.a whenBecomesTrue ShootBalls();
         Gamepads.gamepad1.rightTrigger.greaterThan(0.3) whenBecomesTrue Intake.runIntake whenBecomesFalse Intake.stopIntake
 
     }
 
     override fun onStartButtonPressed() {
-        InitActuators.init()// Or a LambdaCommand
     }
 
     override fun onUpdate() {

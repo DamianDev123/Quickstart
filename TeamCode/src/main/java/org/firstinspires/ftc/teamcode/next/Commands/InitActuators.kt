@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.next.Commands
 
 import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
 import org.firstinspires.ftc.teamcode.next.subsystems.Intake
@@ -15,12 +16,12 @@ import dev.nextftc.core.subsystems.Subsystem
 object InitActuators: Subsystem {
 
 
-   val init = InstantCommand  {
-        Hood.closeHood()
-        Intake.stopIntake()
-        Flap.closeFlap()
-        Flywheel.flywheelsOn = false;
-    }
+   val init = SequentialGroup(
+        Hood.closeHood,
+        Intake.stopIntake,
+        Flap.closeFlap,
+        InstantCommand { Flywheel.flywheelsOn = false }
+    )
     fun init(){
         Hood.closeHood()
         Intake.stopIntake()
