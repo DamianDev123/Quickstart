@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.next.subsystems.outtake
 
-import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -14,21 +13,21 @@ import org.firstinspires.ftc.teamcode.next.subsystems.DriveTrain
 import org.firstinspires.ftc.teamcode.next.subsystems.DriveTrain.currentHeading
 import org.firstinspires.ftc.teamcode.next.subsystems.DriveTrain.currentX
 import org.firstinspires.ftc.teamcode.next.subsystems.DriveTrain.currentY
-import org.firstinspires.ftc.teamcode.next.subsystems.Limelight
+import org.firstinspires.ftc.teamcode.next.subsystems.NewOuttake
 import org.firstinspires.ftc.teamcode.next.subsystems.NewOuttake.goalX
 import org.firstinspires.ftc.teamcode.next.subsystems.NewOuttake.goalY
 
 import org.firstinspires.ftc.teamcode.next.subsystems.data.Alliance
 import kotlin.math.PI
 import kotlin.math.atan2
-@Configurable
+
 object Turret: Subsystem {
     private val turret = MotorEx("Turret")
     private val gearRatio = 112/20
 
     @JvmField var autoTurret = true
 
-    @JvmField var turretPID = PIDCoefficients(0.0,0.0,0.0)
+    @JvmField var turretPID = PIDCoefficients(1.0,0.0,0.0)
     var turretController = controlSystem {
         posPid(turretPID)
     }
@@ -48,10 +47,8 @@ object Turret: Subsystem {
     }
     private fun autoAim() {
         val mu = atan2(goalY - currentY, goalX - currentX);
-        val deltaHeading = normalizeAngle(mu - currentHeading)
-        val clampedHeading = deltaHeading.coerceIn(-PI, PI)
-        turretController.goal = KineticState(clampedHeading, 0.0)
-        turret.power = turretController.calculate(KineticState(getYaw(), 0.0))
+        NewOuttake.ddd = NewOuttake.pose.distanceFrom(NewOuttake.redGoalTag )
+
     }
 
     fun goToYaw(yaw:Double) { // Go to a specific position

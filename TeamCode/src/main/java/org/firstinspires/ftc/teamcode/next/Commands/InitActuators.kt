@@ -16,16 +16,10 @@ import dev.nextftc.core.subsystems.Subsystem
 object InitActuators: Subsystem {
 
 
-   val init = SequentialGroup(
+    val init = SequentialGroup(
         Hood.closeHood,
         Intake.stopIntake,
         Flap.closeFlap,
         InstantCommand { Flywheel.flywheelsOn = false }
     )
-    fun init(){
-        Hood.closeHood()
-        Intake.stopIntake()
-        Flap.closeFlap()
-        Flywheel.flywheelsOn = false;
-    }
 }

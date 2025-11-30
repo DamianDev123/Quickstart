@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.next.subsystems.NewOuttake
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import dev.nextftc.extensions.pedro.PedroComponent.Companion.follower
 import dev.nextftc.ftc.Gamepads
+import dev.nextftc.hardware.impl.ServoEx
 import org.firstinspires.ftc.teamcode.next.Commands.InitActuators
 import org.firstinspires.ftc.teamcode.next.Commands.ShootBalls
 import org.firstinspires.ftc.teamcode.next.subsystems.Intake
@@ -31,34 +32,40 @@ class TeleOP: NextFTCOpMode() {
     init {
         addComponents(
             PedroComponent(Constants::createFollower),
-            SubsystemComponent(DriveTrain, Limelight, NewOuttake, Flywheel, Hood, Intake, Flap,
-                InitActuators),
+            SubsystemComponent(DriveTrain, Limelight, NewOuttake, Flywheel, Hood, Intake, InitActuators,
+                Flap),
             BulkReadComponent,
             BindingsComponent,
         )
-    }
-
-    override fun onInit() {
-
     }
 
     override fun onStartButtonPressed() {
         InitActuators.init.schedule() // Or a LambdaCommand
         Gamepads.gamepad1.a whenBecomesTrue ShootBalls();
         Gamepads.gamepad1.rightTrigger.greaterThan(0.3) whenBecomesTrue Intake.runIntake whenBecomesFalse Intake.stopIntake
-    }
 
+    }
+    val redGoalTag = Pose(
+        -1.48267,
+        1.4133,
+        0.0  // (AprilTags don't require heading for aiming)
+    )
+    fun toPedro(pose: Pose): Pose {
+        return Pose((pose.x* 39.37-72)*-1,pose.y* 39.37+72,pose.heading-90)
+    }
     override fun onUpdate() {
 
         tele.run {
+                addData("pose", NewOuttake.pose)
+
+                addData("mose", NewOuttake.ddd)
+                addData("heading", NewOuttake.pose.heading)
+
+            Hood.updatePosition(0.45);
             try {
                 val current = Limelight.megaTag()
                 if (current != null) {
-                    addData("heading", current)
-
-                    if(follower.pose != null){
-                        follower.pose = current;
-                    }
+                        NewOuttake.pose =  current;
                 }
             }
             catch (e: Error){
@@ -69,4 +76,3 @@ class TeleOP: NextFTCOpMode() {
         }
     }
 }
-

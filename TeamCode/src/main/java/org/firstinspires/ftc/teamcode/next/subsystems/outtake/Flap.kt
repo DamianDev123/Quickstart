@@ -14,12 +14,13 @@ object Flap: Subsystem {
     private val outakeFlap = ServoEx("letIn")
     @JvmField var flapClosed = 0.9;
     @JvmField var flapOpened = 0.0;
-    @JvmField var flapPos = 0.0;
+    @JvmField var flapPos = 0.9;
     override fun periodic() {
         outakeFlap.position = flapPos
+        outakeFlap.servo.position = flapPos;
     }
     val closeFlap = InstantCommand {
-        flapPos = flapOpened
+        flapPos = flapClosed
     }
 
     val openFlap = InstantCommand {
@@ -27,10 +28,10 @@ object Flap: Subsystem {
     }
 
     fun closeFlap(){
-       //outakeFlap.position = flapClosed;
+        flapPos = flapClosed
     }
     fun openFlap(){
-        outakeFlap.position = flapOpened;
+        flapPos = flapOpened
     }
 
 }

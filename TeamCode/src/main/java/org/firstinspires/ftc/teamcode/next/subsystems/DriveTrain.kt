@@ -20,8 +20,8 @@ object DriveTrain: Subsystem {
 
     @JvmField var alliance = Alliance.RED
     @JvmField var sensitivity = 0.8
-    var currentX: Double = 0.0
-    var currentY: Double = 0.0
+    var currentX: Double =1900.0
+    var currentY: Double = 19000.0
     var currentHeading: Double = 0.0
     var Running: Boolean = false;
 
@@ -37,9 +37,9 @@ object DriveTrain: Subsystem {
         )
 
     override fun periodic() {
-        currentX = follower.pose.x
-        currentY = follower.pose.y
-        currentHeading = follower.heading
+        currentX = NewOuttake.pose.x
+        currentY = NewOuttake.pose.y
+        currentHeading = NewOuttake.pose.heading
 
     }
 

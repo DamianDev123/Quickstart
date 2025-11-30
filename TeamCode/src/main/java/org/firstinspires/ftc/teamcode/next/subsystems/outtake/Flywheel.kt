@@ -18,8 +18,8 @@ import java.time.Instant
 object Flywheel: Subsystem {
     private val f1 = MotorEx("Shooter")
     val tele = PanelsTelemetry.ftcTelemetry;
-    @JvmField var flywheelPID = PIDCoefficients(0.01, 0.0, 0.0)
-    @JvmField var flywheelFF = BasicFeedforwardParameters(0.00042, 0.0, 0.19)
+    @JvmField var flywheelPID = PIDCoefficients(0.0, 0.0, 0.0)
+    @JvmField var flywheelFF = BasicFeedforwardParameters(0.0006, 0.0, 0.19)
      var flywheelController = controlSystem {
         velPid(flywheelPID)
         basicFF(flywheelFF)

@@ -14,12 +14,9 @@ object Intake: Subsystem {
 
     private val transferMotor = MotorEx("Transfer")
     private val intakeMotor = MotorEx("Intake")
-    private val outakeFlap = ServoEx("letIn")
     val  runIntake = InstantCommand {
         transferMotor.power = -1.0
         intakeMotor.power = -1.0;
-        Flywheel.flywheelsOn = true;
-        outakeFlap.position = 1.0
     }
 
     val stopIntake = InstantCommand {

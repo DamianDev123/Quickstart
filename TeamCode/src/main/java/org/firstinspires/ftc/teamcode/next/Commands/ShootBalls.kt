@@ -6,88 +6,110 @@ import dev.nextftc.core.commands.Command
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
 import org.firstinspires.ftc.teamcode.next.subsystems.Intake
+import org.firstinspires.ftc.teamcode.next.subsystems.NewOuttake
 import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Flap
 import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Flywheel
+import kotlin.math.abs
 
 @Configurable
 class ShootBalls : Command() {
-
-
 
     private var isFlapOpen = false
     private var flapOpenTime = 0L
 
     private var startTime = System.nanoTime()
-    private var dipCount = 0                 // <-- count dips
-    private var dipActive = false            // avoid double-counting during one dip
-    val tele = PanelsTelemetry.ftcTelemetry;
+    private val tele = PanelsTelemetry.ftcTelemetry
+
+    // --- Shot detection variables ---
+    private var lastVelocity = 0.0
+    private var dipActive = false
+    private var shotCount = 0
+
     override val isDone: Boolean
         get() {
-            // end early after 2 dips
-            if (dipCount >= 2) return true
-            return (System.nanoTime() - startTime) / 1e9 > 6.0
+            // End automatically after 6 seconds (you can change)
+            return (System.nanoTime() - startTime) / 1e9 >6.0
         }
 
     override fun start() {
         Flywheel.flywheelsOn = true
+
         startTime = System.nanoTime()
+
         isFlapOpen = false
         flapOpenTime = 0L
-        dipCount = 0
+
+        // Reset shot detection
         dipActive = false
-        Flap.closeFlap();
+        shotCount = 0
+        lastVelocity = Flywheel.currentVelocity
+
+        Flap.closeFlap()
     }
 
     override fun update() {
-        tele.addData("dips",dipCount);
-        tele.update();
-        val tolerance = 50
-        val dipThreshold = 300
+        tele.update()
+        NewOuttake.atSpeed = shotCount;
 
-        val speedError = Flywheel.currentVelocity - Flywheel.targetVelocity
-        val atSpeed = kotlin.math.abs(speedError) < tolerance
+        val tolerance = 120
+        val currentVel = Flywheel.currentVelocity
+        val targetVel = Flywheel.targetVelocity
+        val atSpeed = abs(currentVel - targetVel) < tolerance
 
-        // 🚨 --- Velocity dip detection ---
-        if (speedError < -dipThreshold && isFlapOpen) {
-            if (!dipActive) {
-                dipCount++          // <-- count dip ONCE
-                dipActive = true
-            }
+        // ============================================================
+        //                SHOT DETECTION USING RPM DIP
+        // ============================================================
+        val dipThreshold = 200 // RPM drop threshold for detecting a ball feed
+        val delta = lastVelocity - currentVel
 
-            // pause feeding + close
-            isFlapOpen = false
-            Intake.runIntake();
-            //Flap.closeFlap();
-            return
-        } else {
-            // dip has ended → allow next dip to be counted
-            dipActive = false
+        // Detect start of dip
+        if (delta > dipThreshold && !dipActive) {
+            dipActive = true
         }
 
-        // --- Open flap once at speed ---
+        // Detect recovery → confirm shot
+        if (dipActive && atSpeed) {
+            shotCount++
+            dipActive = false
+            tele.addData("Shots Fired", shotCount)
+        }
+
+        lastVelocity = currentVel
+        // ============================================================
+
+
+        // ============================================================
+        //                NORMAL SHOOTING CONTROL LOGIC
+        // ============================================================
+
+        // --- Open flap once flywheel reaches speed ---
         if (atSpeed && !isFlapOpen) {
             isFlapOpen = true
             Flap.openFlap()
             flapOpenTime = System.nanoTime()
             return
         }
-        // --- Delay before feeding ---
+
+        // Update LED/states for UI
+        NewOuttake.atSpeed = if (atSpeed) 1 else 0
+
+        // --- Intake feeding logic ---
         if (isFlapOpen) {
             val elapsedMs = (System.nanoTime() - flapOpenTime) / 1_000_000
 
             if (elapsedMs > 600) {
-                Intake.runIntake();
+                Intake.runIntake()
             } else {
-                Intake.stopIntake();
+                Intake.stopIntake()
             }
         } else {
-            Intake.stopIntake();
+            Intake.stopIntake()
         }
     }
 
     override fun stop(interrupted: Boolean) {
         Flywheel.flywheelsOn = false
-        Intake.stopIntake();
-        //Flap.closeFlap();
+        Intake.stopIntake()
+        Flap.closeFlap()
     }
 }
