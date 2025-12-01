@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.next.subsystems.Intake
 import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Flap
 import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Flywheel
 import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Hood
+import org.firstinspires.ftc.teamcode.next.subsystems.outtake.Turret
 
 
 @TeleOp(name = "DFF")
@@ -50,22 +51,15 @@ class TeleOP: NextFTCOpMode() {
         1.4133,
         0.0  // (AprilTags don't require heading for aiming)
     )
-    fun toPedro(pose: Pose): Pose {
-        return Pose((pose.x* 39.37-72)*-1,pose.y* 39.37+72,pose.heading-90)
-    }
     override fun onUpdate() {
 
         tele.run {
-                addData("pose", NewOuttake.pose)
-
-                addData("mose", NewOuttake.ddd)
-                addData("heading", NewOuttake.pose.heading)
 
             Hood.updatePosition(0.45);
             try {
                 val current = Limelight.megaTag()
                 if (current != null) {
-                        NewOuttake.pose =  current;
+                        follower.pose =  current;
                 }
             }
             catch (e: Error){

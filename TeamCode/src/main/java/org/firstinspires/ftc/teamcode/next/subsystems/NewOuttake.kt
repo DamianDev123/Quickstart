@@ -27,7 +27,6 @@ object NewOuttake: SubsystemGroup( Turret, Flywheel, Hood) {
     @JvmField var goalY = redGoalTag.y;
     var ddd = 0.0;
     var atSpeed = 0;
-    var pose : Pose = Pose(0.0,0.0,0.0);
 
     var dist: Double = 0.0;
 
@@ -36,13 +35,9 @@ object NewOuttake: SubsystemGroup( Turret, Flywheel, Hood) {
     }
 
     override fun periodic() {
-        if (fullManual) {
-            Turret.autoTurret = false
-            manualAim()
-        } else {
-            Turret.autoTurret = true
-            auto()
-        }
+        Turret.autoTurret = true
+        auto()
+
 
         if(autoShoot) {
             autoShoot()
@@ -60,7 +55,7 @@ object NewOuttake: SubsystemGroup( Turret, Flywheel, Hood) {
 //        val values: DoubleArray = Aimbot.getValues(dist)
 //
           Hood.updatePosition(0.0)
-          Flywheel.updatePid(1700.0)
+          Flywheel.updatePid(1400.0)
     }
 
     fun autoShoot() {

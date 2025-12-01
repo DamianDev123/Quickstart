@@ -20,9 +20,9 @@ object DriveTrain: Subsystem {
 
     @JvmField var alliance = Alliance.RED
     @JvmField var sensitivity = 0.8
-    var currentX: Double =1900.0
-    var currentY: Double = 19000.0
-    var currentHeading: Double = 0.0
+    var currentX: Double =120.5
+    var currentY: Double = 129.0
+    var currentHeading: Double = Math.toRadians(216.0);
     var Running: Boolean = false;
 
     override val defaultCommand: Command
@@ -37,9 +37,9 @@ object DriveTrain: Subsystem {
         )
 
     override fun periodic() {
-        currentX = NewOuttake.pose.x
-        currentY = NewOuttake.pose.y
-        currentHeading = NewOuttake.pose.heading
+        currentX = follower.pose.x;
+        currentY =follower.pose.y;
+        currentHeading = follower.heading;
 
     }
 
@@ -48,6 +48,9 @@ object DriveTrain: Subsystem {
             Alliance.RED -> follower.setStartingPose(Far12.start)
             Alliance.BLUE -> follower.setStartingPose(Far12.start)
         }
+        currentX = follower.pose.x;
+        currentY =follower.pose.y;
+        currentHeading = follower.heading;
     }
 
     fun PoseInTriangle(p: Pose, a: Pose, b: Pose, c: Pose): Boolean {
